@@ -1,0 +1,18 @@
+{
+  "SavePath": "C:\\Users\\Admin\\AppData\\Roaming\\EldenRing\\76561198686252493\\ER0000.sl2",
+  "SlotIndex": 1,
+  "ShowOnlyInGame": true,
+  "UserHidden": false,
+  "CursorBySlot": {
+    "0": 24,
+    "9": 2,
+    "1": 2
+  },
+  "SourceCursorBySlot": {
+    "9": 0,
+    "1": 2801
+  },
+  "ManualDone": [
+    "1:base:w2-2"
+  ]
+}

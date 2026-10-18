@@ -1,0 +1,74 @@
+// Tuyến có chứng cứ save + các bước thủ công; chưa phải danh mục 100% hoàn chỉnh.
+import { EXTRA_STEPS } from './supplement.js';
+const BASE_STEPS = [
+  { id:'tutorial', phase:'Khởi đầu · Limgrave', title:'Hoàn thành Cave of Knowledge', flag:18000850, kind:'Boss', actions:['Từ Stranded Graveyard, nhảy xuống hố hướng dẫn bên phải.','Đi hết các màn né, đỡ và đánh lén; hạ Soldier of Godrick ở cuối hang.','Quay lên, chạm Site of Grace The First Step để mở tuyến Limgrave.'] },
+  { id:'first-step', phase:'Khởi đầu · Limgrave', title:'Mở Site of Grace The First Step', flag:76101, kind:'Grace', actions:['Ra khỏi Stranded Graveyard bằng thang máy.','Chạm điểm ân điển ngay bên ngoài; đánh dấu vị trí Tree Sentinel để quay lại khi mạnh hơn.'] },
+  { id:'elleh', phase:'Khởi đầu · Limgrave', title:'Đến Church of Elleh', flag:76100, kind:'Grace', actions:['Từ The First Step đi về hướng bắc, men theo đường và tránh Tree Sentinel nếu cần.','Chạm Site of Grace trong nhà thờ.','Nói chuyện với thương nhân Kalé.'] },
+  { id:'crafting', phase:'Khởi đầu · Limgrave', title:'Mua Crafting Kit', flag:60120, kind:'Vật phẩm', actions:['Tại Church of Elleh, mua Crafting Kit từ Kalé.','Mở mục Item Crafting để kiểm tra đã có chức năng chế tạo.'] },
+  { id:'gatefront', phase:'Khởi đầu · Limgrave', title:'Mở Site of Grace Gatefront', flag:76111, kind:'Grace', actions:['Đi theo con đường từ Church of Elleh tới Gatefront Ruins.','Chạm ân điển Gatefront ở phía tây trại; đây là điểm thuận tiện để khảo sát trại.'] },
+  { id:'torrent', phase:'Khởi đầu · Limgrave', title:'Nhận Spectral Steed Whistle', flag:60100, kind:'Cốt truyện', actions:['Nghỉ tại các ân điển đầu game, ưu tiên Gatefront.','Chấp nhận lời đề nghị của Melina để nhận còi gọi Torrent.','Thử gọi Torrent ở ngoài khu vực cấm cưỡi.'] },
+  { id:'map-west', phase:'Khởi đầu · Limgrave', title:'Mở bản đồ Limgrave phía tây', flag:62010, kind:'Bản đồ', actions:['Vào Gatefront Ruins từ phía ít lính.','Lấy mảnh bản đồ tại bia đá trên đường chính.','Mở bản đồ và kiểm tra khu Limgrave phía tây đã hiện chi tiết.'] },
+  { id:'whetstone', phase:'Khởi đầu · Limgrave', title:'Lấy Whetstone Knife', flag:60130, kind:'Vật phẩm', actions:['Trong Gatefront Ruins, tìm cầu thang dẫn xuống tầng hầm.','Mở rương để lấy Whetstone Knife cùng Ash of War đầu tiên.','Nghỉ tại ân điển để kiểm tra tùy chọn Ashes of War.'] },
+  { id:'bell', phase:'Khởi đầu · Limgrave', title:'Nhận Spirit Calling Bell', flag:60110, kind:'Vật phẩm', actions:['Sau khi có Torrent, quay lại Church of Elleh vào ban đêm.','Nói với Renna và nhận Spirit Calling Bell.','Nếu đã lỡ cuộc gặp, kiểm tra chỗ Twin Maiden Husks ở Roundtable Hold.'] },
+  { id:'physick', phase:'Limgrave · Khám phá', title:'Lấy Flask of Wondrous Physick', flag:60020, kind:'Vật phẩm', actions:['Đi về phía đông Limgrave tới Third Church of Marika.','Nhặt bình tại nhà thờ và dùng ân điển gần đó.','Kiểm tra menu Mix Wondrous Physick tại một Site of Grace.'] },
+  { id:'beastman', phase:'Limgrave · Khám phá', title:'Dọn Groveside Cave', flag:31030800, kind:'Boss', actions:['Từ Church of Elleh đi về phía bắc tới Groveside Cave.','Chạm ân điển trong hang, giữ lửa để soi đường.','Hạ Beastman of Farum Azula và nhận phần thưởng.'] },
+  { id:'tree-sentinel', phase:'Limgrave · Khám phá', title:'Quay lại hạ Tree Sentinel', flag:1042360800, kind:'Boss', actions:['Khi đã có Torrent hoặc vũ khí mạnh hơn, quay về The First Step.','Giữ khoảng cách với đòn quét rộng; đánh sau mỗi nhịp lao hoặc cú bổ.','Xác nhận boss biến mất và nhận Golden Halberd.'] },
+  { id:'irina', phase:'Weeping Peninsula', title:'Bắt đầu tuyến Irina và Edgar', manual:true, kind:'Quest', actions:['Qua Bridge of Sacrifice ở phía nam Limgrave; nói với Irina bên đường và nhận lá thư.','Đi tới Castle Morne, tìm Edgar trên thành lũy rồi giao thư trước khi kết thúc tuyến lâu đài.','Sau khi hạ boss Castle Morne, quay lại nói chuyện với Edgar và kiểm tra Irina.'], warning:'Nhánh quest cần kiểm tra thủ công; bản demo chưa đọc đủ cờ hội thoại.' },
+  { id:'weeping-map', phase:'Weeping Peninsula', title:'Mở bản đồ Weeping Peninsula', flag:62011, kind:'Bản đồ', actions:['Sau Bridge of Sacrifice, tiếp tục theo đường chính về phía nam.','Nhặt mảnh bản đồ ở bia đá gần Castle Morne Rampart.','Mở bản đồ để xác nhận bán đảo đã hiện.'] },
+  { id:'leonine', phase:'Weeping Peninsula', title:'Hạ Leonine Misbegotten', flag:1043300800, kind:'Boss', actions:['Từ Castle Morne, đi qua khu thành và ra bãi biển phía sau.','Vào màn sương, giữ thể lực để né chuỗi đòn nhanh của Leonine.','Nhận Grafted Blade Greatsword; quay lại nói với Edgar nếu đang làm quest.'] },
+  { id:'margit', phase:'Stormveil Castle', title:'Hạ Margit', flag:9101, kind:'Boss', actions:['Từ Stormhill Shack theo đường lên Stormveil Castle.','Chạm ân điển trước cổng boss; có thể tìm Margit’s Shackle để hỗ trợ.','Hạ Margit, sau đó vào Stormveil.'] },
+  { id:'godrick', phase:'Stormveil Castle', title:'Hạ Godrick và lấy Great Rune', flag:9100, kind:'Boss', actions:['Đi qua Stormveil, mở các Site of Grace làm điểm quay lại.','Hạ Godrick the Grafted ở sân cuối lâu đài.','Kiểm tra Remembrance và Godrick’s Great Rune trong túi.'] },
+  { id:'godrick-rune', phase:'Stormveil Castle', title:'Đến Divine Tower of Limgrave', flag:73412, kind:'Grace', actions:['Từ Stormveil đi qua Limgrave Tower Bridge.','Đến Divine Tower of Limgrave, leo lên đỉnh và tương tác với Two Fingers.','Về Site of Grace để trang bị Great Rune; cần Rune Arc để kích hoạt hiệu lực.'], warning:'Cờ Grace chỉ xác nhận đã đến tháp; thao tác khôi phục Great Rune cần tự kiểm tra.' },
+  { id:'liurnia', phase:'Liurnia', title:'Vào Liurnia of the Lakes', flag:76201, kind:'Grace', actions:['Rời Stormveil qua cửa sau sau khi hạ Godrick, hoặc đi đường vòng nếu muốn khám phá sớm.','Chạm Site of Grace Liurnia Lake Shore.','Ưu tiên lấy các mảnh bản đồ Liurnia và bắt đầu các quest quanh hồ.'] },
+  { id:'academy-wolf', phase:'Liurnia', title:'Hạ Red Wolf of Radagon', flag:14000850, kind:'Boss', actions:['Lấy Academy Glintstone Key ở phía tây học viện, gần rồng Smarag.','Dùng chìa khóa vào Raya Lucaria Academy, đi qua phòng học và thang máy.','Hạ Red Wolf of Radagon ở Debate Parlor.'] },
+  { id:'rennala', phase:'Liurnia', title:'Hạ Rennala', flag:9118, kind:'Boss', actions:['Từ Debate Parlor đi qua sân học viện tới Grand Library.','Ở pha đầu, tìm ba học giả phát hào quang để phá lá chắn.','Ở pha hai, né phép tầm xa, áp sát đúng nhịp và hạ Rennala.'] },
+  { id:'ranni', phase:'Liurnia', title:'Mở Ranni’s Rise và ghi nhận quest', flag:76228, kind:'Grace', actions:['Đi qua Caria Manor ở tây bắc Liurnia và hạ Royal Knight Loretta.','Đến Three Sisters, vào Ranni’s Rise và nói chuyện với Ranni.','Nói với các cộng sự trong tháp rồi quay lại Ranni để bắt đầu tuyến dài dẫn tới Age of Stars.'], warning:'Ân điển chỉ chứng minh đã đến tháp; việc nhận quest cần tự kiểm tra.' },
+  { id:'radahn', phase:'Caelid · Cửa vào DLC', title:'Hạ Starscourge Radahn', flag:9130, kind:'Boss', actions:['Kích hoạt Radahn Festival qua tuyến Ranni/Blaidd hoặc nghỉ tại ân điển Altus Plateau.','Đến Redmane Castle, nói với Jerren và dùng cổng dịch chuyển ra Wailing Dunes.','Hạ Radahn; đây là một trong hai điều kiện mở Shadow of the Erdtree.'] },
+  { id:'mohg', phase:'Mohgwyn · Cửa vào DLC', title:'Hạ Mohg, Lord of Blood', flag:9112, kind:'Boss', actions:['Vào Mohgwyn Palace qua quest Varré hoặc cổng ở Consecrated Snowfield.','Đi tới Dynasty Mausoleum, chuẩn bị chống chảy máu và tìm Purifying Crystal Tear nếu cần.','Hạ Mohg; đây là điều kiện thứ hai để vào Shadow of the Erdtree.'] },
+  { id:'dlc-entry', phase:'Shadow of the Erdtree · DEMO', title:'Đến Gravesite Plain', flag:76800, kind:'DLC', actions:['Sau khi hạ Radahn và Mohg, quay lại kén Miquella trong đấu trường Mohg.','Tương tác với cánh tay thò ra từ kén để tới Realm of Shadow.','Chạm Site of Grace Gravesite Plain; tìm Scadutree Fragments sớm.'] },
+  { id:'divine-beast', phase:'Shadow of the Erdtree · DEMO', title:'Hạ Divine Beast Dancing Lion', flag:9140, kind:'DLC boss', actions:['Khám phá Belurat ở tây bắc Gravesite Plain.','Mở đường tới nhà hát và chạm ân điển gần boss.','Hạ Divine Beast Dancing Lion, rồi kiểm tra các NPC quanh khu vực trước khi tiến xa hơn.'] },
+  { id:'rellana', phase:'Shadow of the Erdtree · DEMO', title:'Hạ Rellana', flag:9190, kind:'DLC boss', actions:['Đi về phía đông Gravesite Plain tới Castle Ensis.','Mở lối tắt trong lâu đài và Site of Grace trước màn sương.','Hạ Rellana, Twin Moon Knight để mở lối lên Scadu Altus.'] },
+  { id:'messmer', phase:'Shadow of the Erdtree · DEMO', title:'Hạ Messmer', flag:9146, kind:'DLC boss', actions:['Khám phá Shadow Keep và Specimen Storehouse.','Mở Site of Grace Messmer’s Dark Chamber.','Hạ Messmer để lấy ngọn lửa cần cho cốt truyện DLC.'] },
+  { id:'dlc-final', phase:'Shadow of the Erdtree · DEMO', title:'Hạ boss cuối DLC', flag:9143, kind:'DLC boss', actions:['Hoàn thành tuyến cốt truyện Shadow Keep và Enir-Ilim.','Chuẩn bị Scadutree Blessing và Revered Spirit Ash Blessing ở mức phù hợp.','Hạ Promised Consort Radahn, rồi quay lại rà soát boss/quest/vật phẩm còn thiếu.'], warning:'Bản demo chưa rà đủ các nhánh quest và vật phẩm dễ bỏ lỡ của DLC.' },
+  { id:'morgott', phase:'Kết thúc game gốc · DEMO', title:'Hạ Morgott', flag:9104, kind:'Boss', actions:['Đạt đủ Great Runes và tới Leyndell, Royal Capital.','Đi qua Erdtree Sanctuary tới Elden Throne.','Hạ Morgott và kiểm tra các tuyến quest ở thủ đô.'] },
+  { id:'bolt', phase:'Kết thúc game gốc · DEMO', title:'Kiểm tra Bolt of Gransax trước Maliketh', manual:true, kind:'Dễ bỏ lỡ', actions:['Tại Leyndell, Royal Capital, tới chiếc giáo khổng lồ cắm trong thành.','Leo lên thân giáo và lấy Bolt of Gransax.','Kiểm tra trong kho/vũ khí; đánh dấu thủ công khi đã có.'], warning:'Leyndell đổi trạng thái sau Maliketh. Nếu đã bỏ lỡ, cần lên NG+ để lấy lại.' },
+  { id:'fire-giant', phase:'Kết thúc game gốc · DEMO', title:'Hạ Fire Giant', flag:9131, kind:'Boss', actions:['Đi qua Mountaintops of the Giants tới Forge of the Giants.','Hạ Fire Giant, rồi rà lại các quest còn phụ thuộc Leyndell.','Chỉ tiếp tục đốt Erdtree khi đã kiểm tra các mục dễ bỏ lỡ.'] },
+  { id:'maliketh', phase:'Kết thúc game gốc · DEMO', title:'Hạ Maliketh', flag:9116, kind:'Boss', actions:['Đi qua Crumbling Farum Azula và mở ân điển Beside the Great Bridge.','Hạ Maliketh, the Black Blade.','Sau đó thủ đô thành Leyndell, Ashen Capital; đối chiếu checklist đồ dễ bỏ lỡ.'], warning:'Mốc thay đổi thế giới; kiểm tra Bolt of Gransax trước.' },
+  { id:'elden-beast', phase:'Kết thúc game gốc · DEMO', title:'Hạ Elden Beast', flag:9123, kind:'Boss', actions:['Từ Ashen Capital vào Erdtree, hạ các boss cuối.','Hạ Radagon rồi Elden Beast.','Trước khi chọn ending, ghi lại những nhánh ending đã mở và cân nhắc NG+ cho các ending khác.'] },
+  { id:'ending-lord', phase:'Kết thúc · Nhiều lượt chơi', title:'Ending Elden Lord / Age of Fracture', flag:20, kind:'Ending', actions:['Sau Elden Beast, tương tác với Marika theo nhánh Elden Lord.','Nếu định lấy cả ba achievement ending, lên kế hoạch cho các lượt NG+ tiếp theo.'] },
+  { id:'ending-stars', phase:'Kết thúc · Nhiều lượt chơi', title:'Ending Age of Stars', flag:21, kind:'Ending', actions:['Hoàn thành quest Ranni trước boss cuối.','Sau Elden Beast, dùng dấu triệu hồi màu xanh của Ranni.','Đối chiếu thành tựu trên Steam vì save chỉ cho biết trạng thái trong game.'] },
+  { id:'ending-frenzy', phase:'Kết thúc · Nhiều lượt chơi', title:'Ending Lord of Frenzied Flame', flag:22, kind:'Ending', actions:['Mở tuyến Three Fingers ở Subterranean Shunning-Grounds.','Chọn nhánh Frenzied Flame sau Elden Beast ở một lượt chơi phù hợp.','Nếu muốn đổi nhánh sau khi nhận Frenzied Flame, cần tuyến Miquella’s Needle.'] }
+];
+
+export const STEPS = [...BASE_STEPS];
+for (const extra of EXTRA_STEPS) {
+  const anchor = STEPS.findIndex(step => step.id === extra.after);
+  if (anchor < 0) throw new Error(`Không tìm thấy bước trước: ${extra.after}`);
+  STEPS.splice(anchor + 1, 0, extra);
+}
+const queries = {
+  tutorial:'Cave of Knowledge', 'first-step':'The First Step', elleh:'Church of Elleh', crafting:'Church of Elleh', gatefront:'Gatefront', torrent:'Gatefront', 'map-west':'Map Limgrave West', whetstone:'Gatefront Ruins', bell:'Church of Elleh', physick:'Third Church of Marika', beastman:'Groveside Cave', 'tree-sentinel':'Tree Sentinel', irina:'Bridge of Sacrifice', 'weeping-map':'Map Weeping Peninsula', leonine:'Castle Morne', margit:'Margit', godrick:'Godrick the Grafted', 'godrick-rune':'Divine Tower of Limgrave', liurnia:'Liurnia Lake Shore', 'academy-wolf':'Red Wolf of Radagon', rennala:'Rennala', ranni:'Ranni Rise', radahn:'Starscourge Radahn', mohg:'Mohg Lord of Blood', 'dlc-entry':'Gravesite Plain', 'divine-beast':'Divine Beast Dancing Lion', rellana:'Rellana', messmer:'Messmer', 'dlc-final':'Promised Consort Radahn', morgott:'Morgott', bolt:'Bolt of Gransax', 'fire-giant':'Fire Giant', maliketh:'Maliketh', 'elden-beast':'Elden Beast'
+};
+for (const step of STEPS) {
+  step.phase = step.phase.replace(' · DEMO','');
+  step.mapQuery = step.mapQuery || queries[step.id] || step.title.replace(/^(Hạ|Lấy|Dọn|Gặp|Mở|Bắt đầu|Hoàn thành|Nhặt|Nói với|Quay lại)\s+/u,'');
+  step.where = step.where || step.phase;
+  step.mapUrl = step.phase.startsWith('Shadow of the Erdtree')
+    ? 'https://tarnishedforge.com/map/shadow-of-the-erdtree'
+    : 'https://tarnishedforge.com/map';
+  step.guideUrl = step.phase.startsWith('Shadow of the Erdtree')
+    ? 'https://tarnishedforge.com/walkthrough'
+    : 'https://eldenring.redmaw.dev/sheets/walkthrough';
+}
+STEPS.find(step=>step.id==='first-step').mapUrl='https://mapgenie.io/elden-ring/maps/the-lands-between?locationIds=163930';
+STEPS.find(step=>step.id==='elleh').mapUrl='https://mapgenie.io/elden-ring/maps/the-lands-between?locationIds=163934';
+STEPS.find(step=>step.id==='gatefront').mapUrl='https://mapgenie.io/elden-ring/maps/the-lands-between?locationIds=163926';
+STEPS.find(step=>step.id==='beastman').mapUrl='https://mapgenie.io/elden-ring/maps/the-lands-between?locationIds=164027';
+STEPS.find(step=>step.id==='leonine').mapUrl='https://mapgenie.io/elden-ring/maps/the-lands-between?locationIds=163949';
+STEPS.find(step=>step.id==='academy-wolf').mapUrl='https://mapgenie.io/elden-ring/maps/the-lands-between?locationIds=164428';
+STEPS.find(step=>step.id==='morne-claymore').mapQuery='Claymore';
+STEPS.find(step=>step.id==='morne-claymore').mapUrl='https://mapgenie.io/elden-ring/maps/the-lands-between?locationIds=163949';
+
+const phaseOrder=['Khởi đầu · Limgrave','Limgrave · Khám phá','Weeping Peninsula','Stormveil Castle','Liurnia','Caelid · Cửa vào DLC','Nokron & Ranni','Mohgwyn · Cửa vào DLC','Shadow of the Erdtree','Kết thúc game gốc','Kết thúc · Nhiều lượt chơi'];
+STEPS.sort((a,b)=>phaseOrder.indexOf(a.phase)-phaseOrder.indexOf(b.phase));
+export const PHASES = phaseOrder.filter(phase=>STEPS.some(step=>step.phase===phase));
