@@ -32,3 +32,8 @@ Cần cài: **.NET Desktop Runtime 9** và **Node.js 20+** (Windows 64 bit).
 - Nút **BẢN ĐỒ** mở `../elden-ring-map/EldenRingMap.exe` — thư mục bản đồ **không** nằm
   trong repo này (170 MB, ~10.000 file).
 - Chơi ở **Borderless Windowed** thì HUD mới hiện đè lên game.
+
+## 3. Map for Goblins
+
+`map-for-goblins/` — bộ file đã ghép sẵn (MfG + potato2 + Việt hoá, game 1.17.1) và hướng dẫn cài.
+Đọc [map-for-goblins/README.md](map-for-goblins/README.md), nhất là mục "Bẫy".

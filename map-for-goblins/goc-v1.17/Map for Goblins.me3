@@ -1,0 +1,9 @@
+profileVersion = "v1"
+natives = []
+
+[[packages]] 
+id = "Map for Goblins" 
+source = "" 
+
+[[supports]]
+game = "er"
